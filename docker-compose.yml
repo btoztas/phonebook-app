@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  jetty:
+    container_name: jetty
+    image: jetty:9.4.31-jre8
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./target/simple-web-app.war:/var/lib/jetty/webapps/simple-web-app.war
+    networks:
+      - backend
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 12345
+      MYSQL_ROOT_HOST: "%"
+
+networks:
+  backend:
