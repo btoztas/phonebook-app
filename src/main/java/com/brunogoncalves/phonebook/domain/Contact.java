@@ -1,16 +1,14 @@
 package com.brunogoncalves.phonebook.domain;
 
+import java.util.Objects;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.util.Objects;
 
 /**
  * The model of a contact in the Phone Book.
  */
 public class Contact {
-
-    private String id;
 
     @NotNull(message = "The contact must have a first name")
     @NotBlank(message = "The contact must have a first name")
@@ -22,15 +20,10 @@ public class Contact {
 
     @NotNull(message = "The contact must have a phone number")
     @NotBlank(message = "The contact must have a phone number")
-    @Pattern(regexp="^[+][0-9]+[ ][0-9]+[ ][0-9]{6}$", message = "Phone Number does not obey the formatting rules")
+    @Pattern(regexp = "^[+][0-9]+[ ][0-9]+[ ][0-9]{6}$", message = "Phone Number does not obey the formatting rules")
     private String phoneNumber;
 
     public Contact() {
-    }
-
-    public Contact(final String id, final String firstName, final String lastName, final String phoneNumber) {
-        this(firstName, lastName, phoneNumber);
-        this.id = id;
     }
 
     public Contact(final String firstName, final String lastName, final String phoneNumber) {
@@ -64,26 +57,26 @@ public class Contact {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, phoneNumber);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Contact that = (Contact) o;
-        return firstName.equals(that.firstName) &&
-                lastName.equals(that.lastName) &&
-                phoneNumber.equals(that.phoneNumber);
+        final Contact contact = (Contact) o;
+        return firstName.equals(contact.firstName) &&
+               lastName.equals(contact.lastName) &&
+               phoneNumber.equals(contact.phoneNumber);
     }
 
     @Override
     public String toString() {
-        return "PhoneNumber{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", number='" + phoneNumber + '\'' +
-                '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, phoneNumber);
+        return "Contact{" +
+               "firstName='" + firstName + '\'' +
+               ", lastName='" + lastName + '\'' +
+               ", phoneNumber='" + phoneNumber + '\'' +
+               '}';
     }
 }

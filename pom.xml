@@ -5,8 +5,11 @@
 
     <groupId>com.brunogoncalves.phonebook</groupId>
     <artifactId>phonebook</artifactId>
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>backend</module>
+    </modules>
     <name>phonebook</name>
 
     <properties>
@@ -18,6 +21,7 @@
         <el.version>3.0.0</el.version>
         <mysql-driver.version>8.0.21</mysql-driver.version>
         <commons-dbcp.version>2.8.0</commons-dbcp.version>
+        <guava.version>21.0</guava.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -56,6 +60,12 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
