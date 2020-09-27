@@ -16,8 +16,11 @@ import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
 
+//TODO: Search Request Test missing
 public class ContactResourceTest extends JerseyTest {
 
+    private static final String URL_TARGET = "/contact";
+    
     @Mocked
     private ContactPersistence contactPersistence;
 
@@ -43,7 +46,7 @@ public class ContactResourceTest extends JerseyTest {
         final Entity<String> jsonBody = newContactJson("Rick", "Morty", "+39 02 123456");
         final Contact expectedContact = new Contact("Rick", "Morty", "+39 02 123456");
 
-        final Response response = target("/phonebook").request().post(jsonBody);
+        final Response response = target(URL_TARGET).request().post(jsonBody);
 
         new Verifications() {{
             contactPersistence.create(withEqual(expectedContact));
@@ -57,7 +60,7 @@ public class ContactResourceTest extends JerseyTest {
     public void testCreateContactWithInvalidContact() {
         final Entity<String> jsonBody = newContactJson("Rick", "Morty", "+39 123456");
 
-        final Response response = target("/phonebook").request().post(jsonBody);
+        final Response response = target(URL_TARGET).request().post(jsonBody);
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -66,7 +69,7 @@ public class ContactResourceTest extends JerseyTest {
     public void testCreateContactWithMissingFirstName() {
         final Entity<String> jsonBody = newContactJson("", "Morty", "+39 23 123456");
 
-        final Response response = target("/phonebook").request().post(jsonBody);
+        final Response response = target(URL_TARGET).request().post(jsonBody);
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -75,7 +78,7 @@ public class ContactResourceTest extends JerseyTest {
     public void testCreateContactWithMissingLastName() {
         final Entity<String> jsonBody = newContactJson("Rick", "", "+39 23 123456");
 
-        final Response response = target("/phonebook").request().post(jsonBody);
+        final Response response = target(URL_TARGET).request().post(jsonBody);
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -85,7 +88,7 @@ public class ContactResourceTest extends JerseyTest {
         final Entity<String> jsonBody = newContactJson("Rick", "Morty", "+39 02 123456");
         final Contact expectedContact = new Contact("Rick", "Morty", "+39 02 123456");
 
-        final Response response = target("/phonebook").request().put(jsonBody);
+        final Response response = target(URL_TARGET).request().put(jsonBody);
 
         new Verifications() {{
             contactPersistence.update(withEqual(expectedContact));
@@ -99,7 +102,7 @@ public class ContactResourceTest extends JerseyTest {
     public void testUpdateContactWithInvalidContact() {
         final Entity<String> jsonBody = newContactJson("Rick", "Morty", "+39 123456");
 
-        final Response response = target("/phonebook").request().put(jsonBody);
+        final Response response = target(URL_TARGET).request().put(jsonBody);
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -108,7 +111,7 @@ public class ContactResourceTest extends JerseyTest {
     public void testUpdateContactWithMissingFirstName() {
         final Entity<String> jsonBody = newContactJson("", "Morty", "+39 23 123456");
 
-        final Response response = target("/phonebook").request().put(jsonBody);
+        final Response response = target(URL_TARGET).request().put(jsonBody);
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -117,11 +120,26 @@ public class ContactResourceTest extends JerseyTest {
     public void testUpdateContactWithMissingLastName() {
         final Entity<String> jsonBody = newContactJson("Rick", "", "+39 23 123456");
 
-        final Response response = target("/phonebook").request().put(jsonBody);
+        final Response response = target(URL_TARGET).request().put(jsonBody);
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
+    
+    /**
+    @Test
+    public void testDeleteContactWithInvalidPhoneNumber() throws ContactPersistenceException {
+        final String phoneNumber = "39 02 123456";
+        final Entity<String> jsonBody = newDeleteRequestJson(phoneNumber);
 
+        final Response response = target(URL_TARGET).request().put(jsonBody);
+
+        new Verifications() {{
+            contactPersistence.delete(withEqual(phoneNumber));
+            times = 1;
+        }};
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+    **/
     private Entity<String> newContactJson(final String firstName, final String lastName, final String phoneNumber) {
         return Entity.json(String.format("{\"firstName\":\"%s\",\"lastName\":\"%s\",\"phoneNumber\":\"%s\"}",
                 firstName, lastName, phoneNumber));

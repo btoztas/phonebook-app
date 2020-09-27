@@ -10,6 +10,8 @@ import java.util.Objects;
  */
 public class Contact {
 
+    private String id;
+
     @NotNull(message = "The contact must have a first name")
     @NotBlank(message = "The contact must have a first name")
     private String firstName;
@@ -24,6 +26,11 @@ public class Contact {
     private String phoneNumber;
 
     public Contact() {
+    }
+
+    public Contact(final String id, final String firstName, final String lastName, final String phoneNumber) {
+        this(firstName, lastName, phoneNumber);
+        this.id = id;
     }
 
     public Contact(final String firstName, final String lastName, final String phoneNumber) {
