@@ -6,7 +6,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     volumes:
-      - ./target/phone-book.war:/var/lib/jetty/webapps/phone-book.war
+      - ./target/phonebook.war:/var/lib/jetty/webapps/phonebook.war
     networks:
       - backend
     depends_on:
