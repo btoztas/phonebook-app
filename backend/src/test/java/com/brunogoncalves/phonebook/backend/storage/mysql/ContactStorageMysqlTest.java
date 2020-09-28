@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+//TODO: Tests to the Update are missing
 public class ContactStorageMysqlTest {
 
     @Mocked
@@ -141,10 +142,10 @@ public class ContactStorageMysqlTest {
         storageMysql = new ContactStorageMysql(basicDataSource);
 
         expectStorageToGetADbConnection();
-        expectStorageToCreatePreparedStatement("SELECT phone_number, first_name, last_name" +
+        expectStorageToCreatePreparedStatement("SELECT phone_number, first_name, last_name " +
                                                "FROM CONTACT " +
                                                "WHERE phone_number = ? " +
-                                               "   OR fist_name LIKE ?" +
+                                               "   OR first_name LIKE ? " +
                                                "   OR last_name LIKE ? ");
         expectStorageToExecuteSearchPreparedStatement();
         expectResultSetToReturn(queryResults);
@@ -271,9 +272,9 @@ public class ContactStorageMysqlTest {
 
     private void verifyArgumentSettingAndExecutionOfPreparedStatementForCreate(final Contact contact) throws SQLException {
         new Verifications() {{
-            preparedStatement.setString(withEqual(1), withEqual(contact.getFirstName()));
-            preparedStatement.setString(withEqual(2), withEqual(contact.getLastName()));
-            preparedStatement.setString(withEqual(3), withEqual(contact.getPhoneNumber()));
+            preparedStatement.setString(withEqual(1), withEqual(contact.getPhoneNumber()));
+            preparedStatement.setString(withEqual(2), withEqual(contact.getFirstName()));
+            preparedStatement.setString(withEqual(3), withEqual(contact.getLastName()));
             preparedStatement.execute();
         }};
     }

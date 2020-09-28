@@ -1,8 +1,8 @@
 package com.brunogoncalves.phonebook.backend.storage.mysql;
 
+import com.brunogoncalves.phonebook.backend.domain.Contact;
 import com.brunogoncalves.phonebook.backend.storage.ContactStorage;
 import com.brunogoncalves.phonebook.backend.storage.ContactStorageException;
-import com.brunogoncalves.phonebook.backend.domain.Contact;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,16 +29,13 @@ public class ContactStorageMysql implements ContactStorage {
     private static final String INSERT_STATEMENT = "INSERT INTO CONTACT(phone_number, first_name, last_name) " +
                                                    "            VALUES(?, ?, ?) ";
 
-    private static final String SEARCH_STATEMENT = "SELECT phone_number, first_name, last_name" +
+    private static final String SEARCH_STATEMENT = "SELECT phone_number, first_name, last_name " +
                                                    "FROM CONTACT " +
                                                    "WHERE phone_number = ? " +
-                                                   "   OR fist_name LIKE ?" +
+                                                   "   OR first_name LIKE ? " +
                                                    "   OR last_name LIKE ? ";
 
-    private static final String UPDATE_STATEMENT = "UPDATE CONTACT " +
-                                                   "SET first_name = ?, " +
-                                                   "    last_name = ? " +
-                                                   "WHERE phone_number = '?' ";
+    private static final String UPDATE_STATEMENT = "UPDATE CONTACT SET first_name = ?, last_name = ? WHERE phone_number = ?";
 
     private static final String DELETE_STATEMENT = "DELETE FROM CONTACT " +
                                                    "WHERE phone_number = ? ";
@@ -124,9 +121,9 @@ public class ContactStorageMysql implements ContactStorage {
     private void doContactUpdate(final Connection connection, final Contact contact) throws ContactStorageException {
         try {
             final PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_STATEMENT);
-            preparedStatement.setString(1, contact.getPhoneNumber());
-            preparedStatement.setString(2, contact.getFirstName());
-            preparedStatement.setString(3, contact.getLastName());
+            preparedStatement.setString(1, contact.getFirstName());
+            preparedStatement.setString(2, contact.getLastName());
+            preparedStatement.setString(3, contact.getPhoneNumber());
             preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch (SQLException e) {

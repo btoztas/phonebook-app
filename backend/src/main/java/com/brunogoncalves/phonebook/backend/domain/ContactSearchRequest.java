@@ -4,6 +4,9 @@ import java.util.Objects;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * The model of the Contact Search Request.
+ */
 public class ContactSearchRequest {
 
     @NotNull(message = "The search token must not be null")

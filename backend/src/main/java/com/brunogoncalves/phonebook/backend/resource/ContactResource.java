@@ -20,6 +20,9 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Backend resource that is responsible to handle all the REST Requests for Contacts
+ */
 @Path("/contact")
 @Singleton
 @Consumes(MediaType.APPLICATION_JSON)
@@ -64,6 +67,7 @@ public class ContactResource {
         List<Contact> contacts;
         try {
             contacts = contactStorage.searchByToken(contactSearchRequest.getToken());
+            LOGGER.debug("[{}] Search {} got results {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest, contacts);
         } catch (ContactStorageException e) {
             LOGGER.error("[{}] Could perform search {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest, e);
             return Response.serverError().build();

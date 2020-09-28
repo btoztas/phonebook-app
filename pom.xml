@@ -10,6 +10,7 @@
     <modules>
         <module>backend</module>
         <module>system-tests</module>
+        <module>frontend</module>
     </modules>
     <name>phonebook</name>
 
@@ -38,6 +39,5 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
 
 </project>
