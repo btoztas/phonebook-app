@@ -7,7 +7,7 @@ import {
   TableBody,
   TableFooter,
 } from "@material-ui/core";
-import ConctactListEntry from "./ContactListEntry";
+import ConctactListEntry from "../ContactListEntry";
 
 export default function ContactList({ contacts }) {
   if (contacts.length === 0) return <Typography>No Results Found</Typography>;

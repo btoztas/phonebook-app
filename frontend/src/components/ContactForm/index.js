@@ -15,35 +15,31 @@ export default function ContactForm({ defaultContactValue, onFormSubmit }) {
   const [formData, updateFormData] = useState(defaultContactValue);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(false);
-  const [hasPhoneNumberInput, sethasPhoneNumberInput] = useState(false);
+  const [hasPhoneNumberInput, setHasPhoneNumberInput] = useState(false);
 
-  const checkPhoneNumber = (phoneNumberInput) => {
-    if (phoneNumberInput === "") sethasPhoneNumberInput(false);
-    else {
-      sethasPhoneNumberInput(true);
-      setIsPhoneNumberValid(PHONE_NUMBER_REGEX.test(phoneNumberInput));
-    }
+  const checkIfPhoneNumberIsValid = (phoneNumber) => {
+    return PHONE_NUMBER_REGEX.test(phoneNumber);
+  };
+
+  const checkIfPhoneNumberHasInput = (phoneNumber) => {
+    return phoneNumber !== "";
   };
 
   const onFormChange = (event) => {
-    var formDataToUpdate = formData;
-    formDataToUpdate[event.target.id] = event.target.value.trim();
-    updateFormData(formDataToUpdate);
+    var formDataWithUpdate = {};
+    Object.assign(formDataWithUpdate, formData);
+    formDataWithUpdate[event.target.id] = event.target.value.trim();
+    updateFormData(formDataWithUpdate);
   };
 
   useEffect(() => {
-    checkPhoneNumber(formData.phoneNumber);
+    const phoneNumberValid = checkIfPhoneNumberIsValid(formData.phoneNumber);
+    setHasPhoneNumberInput(checkIfPhoneNumberHasInput(formData.phoneNumber));
+    setIsPhoneNumberValid(phoneNumberValid);
     setIsFormValid(
-      isPhoneNumberValid &&
-        formData.firstName !== "" &&
-        formData.lastName !== ""
+      phoneNumberValid && formData.firstName !== "" && formData.lastName !== ""
     );
-  }, [
-    formData.firstName,
-    formData.lastName,
-    formData.phoneNumber,
-    isPhoneNumberValid,
-  ]);
+  }, [formData]);
 
   return (
     <form>
@@ -76,7 +72,7 @@ export default function ContactForm({ defaultContactValue, onFormSubmit }) {
         variant="contained"
         color="primary"
         disabled={!isFormValid}
-        onClick={onFormSubmit}
+        onClick={() => onFormSubmit(formData)}
       >
         Add Contact
       </Button>
