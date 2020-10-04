@@ -1,4 +1,4 @@
-version: '3.3'
+version: '2.3'
 services:
   jetty:
     container_name: jetty
@@ -10,7 +10,8 @@ services:
     networks:
       - backend
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   mysql:
     container_name: mysql
@@ -26,7 +27,9 @@ services:
       MYSQL_DATABASE: phonebook
       MYSQL_ROOT_HOST: "%"
     healthcheck:
-      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER
+      test: "mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 'select 1'"
+      interval: 5s
+      retries: 10
 
 networks:
   backend:

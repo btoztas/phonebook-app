@@ -90,7 +90,7 @@ public class ContactStorageMysqlTest {
 
         expectStorageToGetADbConnection();
         expectStorageToCreatePreparedStatement("INSERT INTO CONTACT(phone_number, first_name, last_name) " +
-                                               "            VALUES(?, ?, ?) ");
+                                               "VALUES(?, ?, ?) ");
 
         storageMysql.create(contact);
 
@@ -144,9 +144,9 @@ public class ContactStorageMysqlTest {
         expectStorageToGetADbConnection();
         expectStorageToCreatePreparedStatement("SELECT phone_number, first_name, last_name " +
                                                "FROM CONTACT " +
-                                               "WHERE phone_number = ? " +
-                                               "   OR first_name LIKE ? " +
-                                               "   OR last_name LIKE ? ");
+                                               "WHERE phone_number LIKE ? " +
+                                               "OR first_name LIKE ? " +
+                                               "OR last_name LIKE ? ");
         expectStorageToExecuteSearchPreparedStatement();
         expectResultSetToReturn(queryResults);
 
@@ -281,7 +281,7 @@ public class ContactStorageMysqlTest {
 
     private void verifyArgumentSettingOfPreparedStatementForSearch(final String token) throws SQLException {
         new Verifications() {{
-            preparedStatement.setString(withEqual(1), withEqual(token));
+            preparedStatement.setString(withEqual(1), withEqual("%" + token + "%"));
             preparedStatement.setString(withEqual(2), withEqual("%" + token + "%"));
             preparedStatement.setString(withEqual(3), withEqual("%" + token + "%"));
         }};

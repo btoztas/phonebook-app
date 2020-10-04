@@ -27,13 +27,13 @@ public class ContactStorageMysql implements ContactStorage {
                                                          " PRIMARY KEY (phone_number)) ";
 
     private static final String INSERT_STATEMENT = "INSERT INTO CONTACT(phone_number, first_name, last_name) " +
-                                                   "            VALUES(?, ?, ?) ";
+                                                   "VALUES(?, ?, ?) ";
 
     private static final String SEARCH_STATEMENT = "SELECT phone_number, first_name, last_name " +
                                                    "FROM CONTACT " +
-                                                   "WHERE phone_number = ? " +
-                                                   "   OR first_name LIKE ? " +
-                                                   "   OR last_name LIKE ? ";
+                                                   "WHERE phone_number LIKE ? " +
+                                                   "OR first_name LIKE ? " +
+                                                   "OR last_name LIKE ? ";
 
     private static final String UPDATE_STATEMENT = "UPDATE CONTACT SET first_name = ?, last_name = ? WHERE phone_number = ?";
 
@@ -90,6 +90,7 @@ public class ContactStorageMysql implements ContactStorage {
             preparedStatement.setString(3, contact.getLastName());
             preparedStatement.execute();
             preparedStatement.close();
+            connection.close();
         } catch (SQLException e) {
             LOGGER.error("Could not perform update for record {}", contact, e);
             throw new ContactStorageException(e);
@@ -99,7 +100,7 @@ public class ContactStorageMysql implements ContactStorage {
     private List<Contact> doContactSearch(final Connection connection, final String token) throws ContactStorageException {
         try {
             final PreparedStatement preparedStatement = connection.prepareStatement(SEARCH_STATEMENT);
-            preparedStatement.setString(1, token);
+            preparedStatement.setString(1, '%' + token + '%');
             preparedStatement.setString(2, '%' + token + '%');
             preparedStatement.setString(3, '%' + token + '%');
             final ResultSet resultSet = preparedStatement.executeQuery();
@@ -111,6 +112,7 @@ public class ContactStorageMysql implements ContactStorage {
             }
             resultSet.close();
             preparedStatement.close();
+            connection.close();
             return contacts;
         } catch (SQLException e) {
             LOGGER.error("Could not search with token {}", token, e);
@@ -126,6 +128,7 @@ public class ContactStorageMysql implements ContactStorage {
             preparedStatement.setString(3, contact.getPhoneNumber());
             preparedStatement.executeUpdate();
             preparedStatement.close();
+            connection.close();
         } catch (SQLException e) {
             LOGGER.error("Could not update record {}", contact, e);
             throw new ContactStorageException(e);
@@ -138,6 +141,7 @@ public class ContactStorageMysql implements ContactStorage {
             preparedStatement.setString(1, phoneNumber);
             preparedStatement.execute();
             preparedStatement.close();
+            connection.close();
         } catch (SQLException e) {
             LOGGER.error("Could not delete record with phone number {}", phoneNumber, e);
             throw new ContactStorageException(e);

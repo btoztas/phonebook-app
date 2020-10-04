@@ -1,5 +1,6 @@
 package com.brunogoncalves.phonebook.backend;
 
+import com.brunogoncalves.phonebook.backend.filter.CORSFilter;
 import com.brunogoncalves.phonebook.backend.resource.ContactResource;
 import com.brunogoncalves.phonebook.backend.storage.ContactStorage;
 import com.brunogoncalves.phonebook.backend.storage.ContactStorageException;
@@ -35,6 +36,7 @@ public class PhoneBookApp extends ResourceConfig {
 
         final ContactStorage contactStorage = (new ContactStorageFactory()).getContactStorage(properties);
 
+        register(new CORSFilter());
         register(ContactResource.class);
         register(new AbstractBinder() {
             @Override
