@@ -1,5 +1,6 @@
 package com.brunogoncalves.phonebook.backend.storage;
 
+import com.brunogoncalves.phonebook.backend.storage.exception.ContactStorageException;
 import com.brunogoncalves.phonebook.backend.storage.mysql.ContactStorageMysql;
 import java.util.Properties;
 import org.slf4j.Logger;

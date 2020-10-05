@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { editContactRequest } from "./Http/editContactRequest";
+import { getContactRequest } from "./Http/getContactRequest";
 
 //TODO: Error handling on all these requests
-export const useEditContact = (newContactData) => {
+export const useGetContact = (contactId) => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (newContactData != null)
-      editContactRequest(newContactData)
+    if (contactId != null)
+      getContactRequest(contactId)
         .then(({ data }) => {
           setError(null);
           setData(data);
@@ -19,7 +19,7 @@ export const useEditContact = (newContactData) => {
           setError(`Something went wrong: ${error}`);
           setIsLoading(false);
         });
-  }, [newContactData]);
+  }, [contactId]);
 
   return [isLoading, data, error];
 };

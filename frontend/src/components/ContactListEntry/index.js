@@ -1,4 +1,5 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
 import {
   Typography,
@@ -10,6 +11,12 @@ import {
 import EditIcon from "@material-ui/icons/Edit";
 
 export default function ConctactListEntry({ contactData }) {
+  const history = useHistory();
+
+  function handleEdit(contactId) {
+    history.push(`/edit/${contactId}`);
+  }
+
   return (
     <TableRow hover>
       <TableCell>
@@ -22,7 +29,7 @@ export default function ConctactListEntry({ contactData }) {
         <Typography>{contactData.phoneNumber}</Typography>
       </TableCell>
       <TableCell>
-        <Button>
+        <Button onClick={() => handleEdit(contactData.id)}>
           <IconButton color="primary">
             <EditIcon />
           </IconButton>

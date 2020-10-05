@@ -5,17 +5,21 @@ import Home from "./views/Home";
 import NewContact from "./views/NewContact";
 import EditContact from "./views/EditContact";
 import PageNotFound from "./views/PageNotFound";
+import TopBar from "./components/TopBar";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route path="/" component={Home} exact />
-        <Route path="/new" component={NewContact} exact />
-        <Route path="/edit" component={EditContact} exact />
-        <Route component={PageNotFound} />
-      </Switch>
-    </BrowserRouter>
+    <>
+      <TopBar />
+      <BrowserRouter>
+        <Switch>
+          <Route path="/" component={Home} exact />
+          <Route path="/new" component={NewContact} exact />
+          <Route path="/edit/:contactId" component={EditContact} exact />
+          <Route component={PageNotFound} />
+        </Switch>
+      </BrowserRouter>
+    </>
   );
 }
 

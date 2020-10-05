@@ -71,10 +71,11 @@ export default function ContactForm({ defaultContactValue, onFormSubmit }) {
       <Button
         variant="contained"
         color="primary"
+        type="submit"
         disabled={!isFormValid}
         onClick={() => onFormSubmit(formData)}
       >
-        Add Contact
+        Submit
       </Button>
     </form>
   );

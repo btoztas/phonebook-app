@@ -15,10 +15,10 @@ export const useContactSearch = (searchToken) => {
           setIsLoading(false);
         })
         .catch(() => {
-          setError("Something went wrong");
+          setError(`Something went wrong: ${error}`);
           setIsLoading(false);
         });
-  }, [searchToken]);
+  }, [error, searchToken]);
 
   return [isLoading, data, error];
 };

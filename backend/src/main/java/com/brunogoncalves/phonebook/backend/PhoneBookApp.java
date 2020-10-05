@@ -3,7 +3,7 @@ package com.brunogoncalves.phonebook.backend;
 import com.brunogoncalves.phonebook.backend.filter.CORSFilter;
 import com.brunogoncalves.phonebook.backend.resource.ContactResource;
 import com.brunogoncalves.phonebook.backend.storage.ContactStorage;
-import com.brunogoncalves.phonebook.backend.storage.ContactStorageException;
+import com.brunogoncalves.phonebook.backend.storage.exception.ContactStorageException;
 import com.brunogoncalves.phonebook.backend.storage.ContactStorageFactory;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Properties;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
-
-import javax.ws.rs.ApplicationPath;
 
 //TODO: Somehow this ApplicationPath is not working
 public class PhoneBookApp extends ResourceConfig {

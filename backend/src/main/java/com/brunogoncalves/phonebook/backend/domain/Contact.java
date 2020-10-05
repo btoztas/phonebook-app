@@ -1,82 +1,64 @@
 package com.brunogoncalves.phonebook.backend.domain;
 
-import java.util.Objects;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-/**
- * The model of a contact in the Phone Book.
- */
+import java.util.Objects;
+
 public class Contact {
 
-    @NotNull(message = "The contact must have a first name")
-    @NotBlank(message = "The contact must have a first name")
-    private String firstName;
+    private int id;
 
-    @NotNull(message = "The contact must have a last name")
-    @NotBlank(message = "The contact must have a last name")
-    private String lastName;
-
-    @NotNull(message = "The contact must have a phone number")
-    @NotBlank(message = "The contact must have a phone number")
-    @Pattern(regexp = "^[+][0-9]+[ ][0-9]+[ ][0-9]{6}$", message = "Phone Number does not obey the formatting rules")
-    private String phoneNumber;
+    @JsonUnwrapped
+    private ContactData contactData;
 
     public Contact() {
     }
 
-    public Contact(final String firstName, final String lastName, final String phoneNumber) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
+    public Contact(final int id, final String firstName, final String lastName, final String phoneNumber) {
+        this.id = id;
+        this.contactData = new ContactData(firstName, lastName, phoneNumber);
     }
 
-    public String getFirstName() {
-        return firstName;
+    public Contact(final int id, final ContactData contactData) {
+        this.id = id;
+        this.contactData = contactData;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getLastName() {
-        return lastName;
+    public long getId() {
+        return id;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public ContactData getContactData() {
+        return contactData;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, phoneNumber);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final Contact contact = (Contact) o;
-        return firstName.equals(contact.firstName) &&
-               lastName.equals(contact.lastName) &&
-               phoneNumber.equals(contact.phoneNumber);
+    public void setContactData(ContactData contactData) {
+        this.contactData = contactData;
     }
 
     @Override
     public String toString() {
         return "Contact{" +
-               "firstName='" + firstName + '\'' +
-               ", lastName='" + lastName + '\'' +
-               ", phoneNumber='" + phoneNumber + '\'' +
-               '}';
+                "id=" + id +
+                ", contactData=" + contactData +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contact contact = (Contact) o;
+        return id == contact.id &&
+                contactData.equals(contact.contactData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, contactData);
     }
 }

@@ -5,9 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Tests the overall functionality of the API. Should be executed with the Docker Environment up.
@@ -31,12 +29,17 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
             assertThat().
-            statusCode(HttpStatus.SC_OK);
+            statusCode(HttpStatus.SC_OK).
+        and().
+            body("id", notNullValue()).
+            body("firstName", equalTo(firstName)).
+            body("lastName", equalTo(lastName)).
+            body("phoneNumber", equalTo(phoneNumber));
     }
 
     @Test
@@ -47,7 +50,7 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
@@ -63,7 +66,7 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
@@ -79,7 +82,7 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
@@ -95,7 +98,7 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
@@ -111,7 +114,7 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
@@ -127,7 +130,7 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
@@ -143,7 +146,7 @@ public class ContactApiTest {
 
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
         when().
             post().
         then().
@@ -152,43 +155,85 @@ public class ContactApiTest {
     }
 
     @Test
-    public void testCreateAndUpdateSearchWithValidContact() {
+    public void testCreateUpdateAndGet() {
         final String firstName = "first_name";
         final String lastName = "last_name";
         final String updatedFirstName = "updated_first_name";
         final String updatedLastName = "updated_last_name";
         final String phoneNumber = Util.randomPhoneNumber();
 
+        //Create Request
+        final int contactId =
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(firstName, lastName, phoneNumber)).
+            body(Util.newContactData(firstName, lastName, phoneNumber)).
+        when().
+            post().
+        then().
+            assertThat().
+            statusCode(HttpStatus.SC_OK).
+        and().
+            extract().
+            path("id");
+
+        //Update Request
+        given().
+            contentType(ContentType.JSON).
+            body(Util.newContactData(updatedFirstName, updatedLastName, phoneNumber)).
+        when().
+            put("/" + contactId).
+        then().
+            assertThat().
+            statusCode(HttpStatus.SC_NO_CONTENT);
+
+        //Get Request
+        given().
+        when().
+            get("/" + contactId).
+        then().
+            assertThat().
+            statusCode(HttpStatus.SC_OK).
+        and().
+            body("id", equalTo(contactId)).
+            body("firstName", equalTo(updatedFirstName)).
+            body("lastName", equalTo(updatedLastName)).
+            body("phoneNumber", equalTo(phoneNumber));
+    }
+
+    @Test
+    public void testCreateSearchWith2Contacts() {
+        final String uniqueName = Util.randomName();
+
+        //Create Request #1
+        given().
+            contentType(ContentType.JSON).
+            body(Util.newContactData(uniqueName, Util.randomName(), Util.randomPhoneNumber())).
         when().
             post().
         then().
             assertThat().
             statusCode(HttpStatus.SC_OK);
 
+        //Create Request #2
         given().
             contentType(ContentType.JSON).
-            body(Util.newContact(updatedFirstName, updatedLastName, phoneNumber)).
+            body(Util.newContactData(uniqueName, Util.randomName(), Util.randomPhoneNumber())).
         when().
-            put().
+            post().
         then().
             assertThat().
             statusCode(HttpStatus.SC_OK);
 
+        //Search Request
         given().
             contentType(ContentType.JSON).
-            body(Util.newSearch(phoneNumber)).
+            body(Util.newSearch(uniqueName)).
         when().
             post(SEARCH).
         then().
             assertThat().
             statusCode(HttpStatus.SC_OK).
         and().
-            body("$", hasSize(1)).
-            body("[0].firstName", equalTo(updatedFirstName)).
-            body("[0].lastName", equalTo(updatedLastName)).
-            body("[0].phoneNumber", equalTo(phoneNumber));
+            body("$", hasSize(2));
     }
 }

@@ -1,8 +1,10 @@
 package com.brunogoncalves.phonebook.backend.storage.mysql;
 
 import com.brunogoncalves.phonebook.backend.domain.Contact;
+import com.brunogoncalves.phonebook.backend.domain.ContactData;
 import com.brunogoncalves.phonebook.backend.storage.ContactStorage;
-import com.brunogoncalves.phonebook.backend.storage.ContactStorageException;
+import com.brunogoncalves.phonebook.backend.storage.exception.*;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,25 +23,38 @@ public class ContactStorageMysql implements ContactStorage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContactStorageMysql.class);
 
-    private static final String CREATE_TABLE_STATEMENT = "CREATE TABLE CONTACT " +
-                                                         "(phone_number VARCHAR(255) not NULL, " +
-                                                         " first_name   VARCHAR(255) not NULL, " +
-                                                         " last_name    VARCHAR(255) not NULL, " +
-                                                         " PRIMARY KEY (phone_number)) ";
+    private static final String CREATE_TABLE_STATEMENT = "" +
+            "CREATE TABLE CONTACT " +
+            "(id           int          not NULL AUTO_INCREMENT, " +
+            " phone_number VARCHAR(255) not NULL, " +
+            " first_name   VARCHAR(255) not NULL, " +
+            " last_name    VARCHAR(255) not NULL, " +
+            " PRIMARY KEY (id)) ";
 
-    private static final String INSERT_STATEMENT = "INSERT INTO CONTACT(phone_number, first_name, last_name) " +
-                                                   "VALUES(?, ?, ?) ";
+    private static final String INSERT_STATEMENT = "" +
+            "INSERT INTO CONTACT(phone_number, first_name, last_name) " +
+            "VALUES(?, ?, ?) ";
 
-    private static final String SEARCH_STATEMENT = "SELECT phone_number, first_name, last_name " +
-                                                   "FROM CONTACT " +
-                                                   "WHERE phone_number LIKE ? " +
-                                                   "OR first_name LIKE ? " +
-                                                   "OR last_name LIKE ? ";
+    private static final String SEARCH_STATEMENT = "" +
+            "SELECT id, phone_number, first_name, last_name " +
+            "FROM CONTACT " +
+            "WHERE phone_number LIKE ? " +
+            "OR first_name LIKE ? " +
+            "OR last_name LIKE ? ";
 
-    private static final String UPDATE_STATEMENT = "UPDATE CONTACT SET first_name = ?, last_name = ? WHERE phone_number = ?";
+    private static final String GET_BY_ID_STATEMENT = "" +
+            "SELECT id, phone_number, first_name, last_name " +
+            "FROM CONTACT " +
+            "WHERE id = ? ";
 
-    private static final String DELETE_STATEMENT = "DELETE FROM CONTACT " +
-                                                   "WHERE phone_number = ? ";
+    private static final String UPDATE_STATEMENT = "" +
+            "UPDATE CONTACT " +
+            "SET phone_number = ?, first_name = ?,  last_name = ? " +
+            "WHERE id = ?";
+
+    private static final String DELETE_STATEMENT = "" +
+            "DELETE FROM CONTACT " +
+            "WHERE id = ? ";
 
     private static final int TABLE_ALREADY_EXISTS_ERROR_CODE = 1050;
 
@@ -55,97 +71,143 @@ public class ContactStorageMysql implements ContactStorage {
     }
 
     @Override
-    public void create(final Contact contact) throws ContactStorageException {
-        LOGGER.info("Creating {}", contact);
-        final Connection connection = getDbConnection(String.format("insert %s", contact.toString()));
-        doContactInsert(connection, contact);
+    public Contact create(final ContactData contactData) throws ContactStorageException, CouldNotInsertContactException {
+        LOGGER.info("Creating {}", contactData);
+        try (final Connection connection = getDbConnection(String.format("insert %s", contactData.toString()));
+             final PreparedStatement preparedStatement = connection.prepareStatement(INSERT_STATEMENT, Statement.RETURN_GENERATED_KEYS)) {
+            bindPreparedStatementsForInsert(preparedStatement, contactData);
+            return executeInsertAndReturnContact(preparedStatement, contactData);
+        } catch (SQLException e) {
+            LOGGER.error("Could not perform insert for record {}", contactData, e);
+            throw new ContactStorageException(e);
+        }
+    }
+
+    private void bindPreparedStatementsForInsert(final PreparedStatement preparedStatement, final ContactData contactData) throws SQLException {
+        preparedStatement.setString(1, contactData.getPhoneNumber());
+        preparedStatement.setString(2, contactData.getFirstName());
+        preparedStatement.setString(3, contactData.getLastName());
+    }
+
+    private Contact executeInsertAndReturnContact(final PreparedStatement preparedStatement, final ContactData contactData) throws SQLException, CouldNotInsertContactException {
+        final int rowsAffected = preparedStatement.executeUpdate();
+        try (final ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+            if (rowsAffected == 1 && resultSet.next())
+                return new Contact(resultSet.getInt(1), contactData);
+
+            throw new CouldNotInsertContactException();
+        }
+    }
+
+    @Override
+    public Contact get(final int contactId) throws ContactStorageException, CouldNotGetContactException {
+        LOGGER.info("Getting contact with Id {}", contactId);
+        try (final Connection connection = getDbConnection(String.format("getting by id %s", contactId));
+             final PreparedStatement preparedStatement = connection.prepareStatement(GET_BY_ID_STATEMENT)) {
+            bindPreparedStatementsForGetById(preparedStatement, contactId);
+            return executeGetByIdAndReturnContact(preparedStatement);
+        } catch (SQLException e) {
+            LOGGER.error("Could not perform get by id {}", contactId, e);
+            throw new ContactStorageException(e);
+        }
+    }
+
+    private Contact executeGetByIdAndReturnContact(final PreparedStatement preparedStatement) throws SQLException, CouldNotGetContactException {
+        try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next())
+                return new Contact(resultSet.getInt("id"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("phone_number"));
+
+            throw new CouldNotGetContactException();
+        }
+    }
+
+    private void bindPreparedStatementsForGetById(final PreparedStatement preparedStatement, final int contactId) throws SQLException {
+        preparedStatement.setInt(1, contactId);
     }
 
     @Override
     public List<Contact> searchByToken(final String token) throws ContactStorageException {
         LOGGER.info("Searching with token {}", token);
-        final Connection connection = getDbConnection(String.format("search by token %s", token));
-        return doContactSearch(connection, token);
-    }
-
-    @Override
-    public void update(final Contact contact) throws ContactStorageException {
-        LOGGER.info("Updating {}", contact);
-        final Connection connection = getDbConnection(String.format("update %s", contact.toString()));
-        doContactUpdate(connection, contact);
-    }
-
-    @Override
-    public void delete(final String phoneNumber) throws ContactStorageException {
-        LOGGER.info("Deleting contact with phone number {}", phoneNumber);
-        final Connection connection = getDbConnection(String.format("delete contact with number %s", phoneNumber));
-        doContactDelete(connection, phoneNumber);
-    }
-
-    private void doContactInsert(final Connection connection, final Contact contact) throws ContactStorageException {
-        try {
-            final PreparedStatement preparedStatement = connection.prepareStatement(INSERT_STATEMENT);
-            preparedStatement.setString(1, contact.getPhoneNumber());
-            preparedStatement.setString(2, contact.getFirstName());
-            preparedStatement.setString(3, contact.getLastName());
-            preparedStatement.execute();
-            preparedStatement.close();
-            connection.close();
+        try (final Connection connection = getDbConnection(String.format("search by token %s", token));
+             final PreparedStatement preparedStatement = connection.prepareStatement(SEARCH_STATEMENT)) {
+            bindPreparedStatementsForSearchWithToken(preparedStatement, token);
+            return executeSearchAndReturnContacts(preparedStatement);
         } catch (SQLException e) {
-            LOGGER.error("Could not perform update for record {}", contact, e);
+            LOGGER.error("Could not perform search for token {}", token, e);
             throw new ContactStorageException(e);
         }
     }
 
-    private List<Contact> doContactSearch(final Connection connection, final String token) throws ContactStorageException {
-        try {
-            final PreparedStatement preparedStatement = connection.prepareStatement(SEARCH_STATEMENT);
-            preparedStatement.setString(1, '%' + token + '%');
-            preparedStatement.setString(2, '%' + token + '%');
-            preparedStatement.setString(3, '%' + token + '%');
-            final ResultSet resultSet = preparedStatement.executeQuery();
-
+    private List<Contact> executeSearchAndReturnContacts(PreparedStatement preparedStatement) throws SQLException {
+        try(final ResultSet resultSet = preparedStatement.executeQuery()) {
             final List<Contact> contacts = new LinkedList<>();
             while (resultSet.next()) {
-                contacts.add(new Contact(resultSet.getString("first_name"), resultSet.getString("last_name"),
-                                         resultSet.getString("phone_number")));
+                contacts.add(
+                        new Contact(resultSet.getInt("id"),
+                                resultSet.getString("first_name"),
+                                resultSet.getString("last_name"),
+                                resultSet.getString("phone_number")));
             }
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
             return contacts;
+        }
+    }
+
+    private void bindPreparedStatementsForSearchWithToken(final PreparedStatement preparedStatement, final String token) throws SQLException {
+        preparedStatement.setString(1, '%' + token + '%');
+        preparedStatement.setString(2, '%' + token + '%');
+        preparedStatement.setString(3, '%' + token + '%');
+    }
+
+    @Override
+    public void update(final ContactData contactData, final int contactId) throws ContactStorageException, CouldNotUpdateContactException {
+        LOGGER.info("Updating contactId {} with contactData {}", contactId, contactData);
+        try (final Connection connection = getDbConnection(String.format("update %s with %s", contactId, contactData.toString()));
+             final PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_STATEMENT)) {
+            bindPreparedStatementsForUpdate(preparedStatement, contactId, contactData);
+            executeUpdate(preparedStatement);
         } catch (SQLException e) {
-            LOGGER.error("Could not search with token {}", token, e);
+            LOGGER.error("Could not perform update of contactId {} with data {}", contactId, contactData, e);
             throw new ContactStorageException(e);
         }
     }
 
-    private void doContactUpdate(final Connection connection, final Contact contact) throws ContactStorageException {
-        try {
-            final PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_STATEMENT);
-            preparedStatement.setString(1, contact.getFirstName());
-            preparedStatement.setString(2, contact.getLastName());
-            preparedStatement.setString(3, contact.getPhoneNumber());
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-            connection.close();
+    private void bindPreparedStatementsForUpdate(final PreparedStatement preparedStatement, final int contactId, final ContactData contactData) throws SQLException {
+        preparedStatement.setString(1, contactData.getPhoneNumber());
+        preparedStatement.setString(2, contactData.getFirstName());
+        preparedStatement.setString(3, contactData.getLastName());
+        preparedStatement.setInt(4, contactId);
+    }
+
+    private void executeUpdate(final PreparedStatement preparedStatement) throws SQLException, CouldNotUpdateContactException {
+        final int rowsAffected = preparedStatement.executeUpdate();
+        if (rowsAffected == 0)
+            throw new CouldNotUpdateContactException();
+    }
+
+    @Override
+    public void delete(final int contactId) throws ContactStorageException, CouldNotDeleteContactException {
+        LOGGER.info("Deleting contact with id {}", contactId);
+        try (final Connection connection = getDbConnection(String.format("delete contact with Id %s", contactId));
+             final PreparedStatement preparedStatement = connection.prepareStatement(DELETE_STATEMENT, Statement.RETURN_GENERATED_KEYS)) {
+            bindPreparedStatementsDelete(preparedStatement, contactId);
+            executeDelete(preparedStatement);
         } catch (SQLException e) {
-            LOGGER.error("Could not update record {}", contact, e);
+            LOGGER.error("Could not perform delete of contactId {}", contactId, e);
             throw new ContactStorageException(e);
         }
     }
 
-    private void doContactDelete(final Connection connection, final String phoneNumber) throws ContactStorageException {
-        try {
-            final PreparedStatement preparedStatement = connection.prepareStatement(DELETE_STATEMENT);
-            preparedStatement.setString(1, phoneNumber);
-            preparedStatement.execute();
-            preparedStatement.close();
-            connection.close();
-        } catch (SQLException e) {
-            LOGGER.error("Could not delete record with phone number {}", phoneNumber, e);
-            throw new ContactStorageException(e);
-        }
+    private void executeDelete(final PreparedStatement preparedStatement) throws SQLException, CouldNotDeleteContactException {
+        final int rowsAffected = preparedStatement.executeUpdate();
+        if (rowsAffected == 0)
+            throw new CouldNotDeleteContactException();
+    }
+
+    private void bindPreparedStatementsDelete(final PreparedStatement preparedStatement, final int contactId) throws SQLException {
+        preparedStatement.setInt(1, contactId);
     }
 
     private Connection getDbConnection(final String operationDescription) throws ContactStorageException {
@@ -158,13 +220,7 @@ public class ContactStorageMysql implements ContactStorage {
     }
 
     private void ensureContactTableIsCreated() throws ContactStorageException {
-        final Connection connection = getDbConnection("Contact Table creation");
-        createContactTable(connection);
-    }
-
-
-    private void createContactTable(final Connection connection) throws ContactStorageException {
-        try {
+        try(final Connection connection = getDbConnection("Contact Table creation")) {
             final Statement statement = connection.createStatement();
             statement.execute(CREATE_TABLE_STATEMENT);
             LOGGER.info("Contact table successfully created");

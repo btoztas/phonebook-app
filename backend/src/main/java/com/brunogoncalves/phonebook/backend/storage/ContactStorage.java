@@ -1,17 +1,21 @@
 package com.brunogoncalves.phonebook.backend.storage;
 
 import com.brunogoncalves.phonebook.backend.domain.Contact;
+import com.brunogoncalves.phonebook.backend.domain.ContactData;
+import com.brunogoncalves.phonebook.backend.storage.exception.*;
 
 import java.util.List;
 
 public interface ContactStorage {
 
-    void create(final Contact contact) throws ContactStorageException;
+    Contact create(final ContactData contactDATA) throws ContactStorageException, CouldNotInsertContactException;
 
-    List<Contact> searchByToken(final String name) throws ContactStorageException;
+    Contact get(int contactId) throws ContactStorageException, CouldNotGetContactException, CouldNotGetContactException;
 
-    void update(final Contact contact) throws ContactStorageException;
+    List<Contact> searchByToken(final String token) throws ContactStorageException;
 
-    void delete(final String number) throws ContactStorageException;
+    void update(final ContactData contactData, final int contactId) throws ContactStorageException, CouldNotUpdateContactException;
+
+    void delete(final int id) throws ContactStorageException, CouldNotDeleteContactException;
 
 }
