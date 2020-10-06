@@ -71,7 +71,7 @@ public class ContactStorageMysqlContactGetTest {
     @Test(expected = ContactStorageException.class)
     public void testContactStorageCreateThrowContactStorageExceptionInCaseOfExceptionGettingConnection()
             throws ContactStorageException, SQLException, CouldNotGetContactException {
-        expectStorageToGetADbConnectionButThrowException(basicDataSource);
+        expectStorageToGetADbConnectionButThrowException(basicDataSource, 6);
 
         storageMysql.get(1);
     }

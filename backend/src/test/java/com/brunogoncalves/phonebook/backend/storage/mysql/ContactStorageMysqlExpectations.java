@@ -19,11 +19,11 @@ public class ContactStorageMysqlExpectations {
         }};
     }
 
-    static void expectStorageToGetADbConnectionButThrowException(final DataSource dataSource) throws SQLException {
+    static void expectStorageToGetADbConnectionButThrowException(final DataSource dataSource, final int nTimes) throws SQLException {
         new Expectations() {{
             dataSource.getConnection();
             result = new SQLException();
-            times = 1;
+            times = nTimes;
         }};
     }
 

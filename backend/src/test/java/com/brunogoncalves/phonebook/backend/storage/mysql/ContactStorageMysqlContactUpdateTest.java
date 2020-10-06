@@ -63,7 +63,7 @@ public class ContactStorageMysqlContactUpdateTest {
         final ContactData contactData = new ContactData("first", "last", "number");
         final int contactId = 1;
 
-        expectStorageToGetADbConnectionButThrowException(basicDataSource);
+        expectStorageToGetADbConnectionButThrowException(basicDataSource, 6);
 
         storageMysql.update(contactData, contactId);
     }

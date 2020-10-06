@@ -71,11 +71,10 @@ public class ContactStorageMysqlContactCreateTest {
     public void testContactStorageCreateThrowContactStorageExceptionInCaseOfExceptionGettingConnection() throws ContactStorageException, SQLException, CouldNotInsertContactException {
         final ContactData contactData = new ContactData("first", "last", "number");
 
-        expectStorageToGetADbConnectionButThrowException(basicDataSource);
+        expectStorageToGetADbConnectionButThrowException(basicDataSource, 6);
 
         storageMysql.create(contactData);
     }
-
 
     @Test(expected = ContactStorageException.class)
     public void testContactStorageCreateThrowContactStorageExceptionInCaseOfExceptionCreatingPreparedStatement() throws ContactStorageException, SQLException, CouldNotInsertContactException {

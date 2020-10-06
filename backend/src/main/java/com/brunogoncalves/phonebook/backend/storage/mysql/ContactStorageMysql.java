@@ -57,6 +57,8 @@ public class ContactStorageMysql implements ContactStorage {
 
     private static final int TABLE_ALREADY_EXISTS_ERROR_CODE = 1050;
 
+    private static final int RETRIES_ON_DB_CONNECTION = 5;
+
     private final BasicDataSource dataSource;
 
     public ContactStorageMysql(final String dbUser, final String dbPass, final String jdbcString) throws ContactStorageException {
@@ -193,11 +195,26 @@ public class ContactStorageMysql implements ContactStorage {
     }
 
     private Connection getDbConnection(final String operationDescription) throws ContactStorageException {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException e) {
-            LOGGER.error("Could not get a DB Connection to {}", operationDescription, e);
-            throw new ContactStorageException(e);
+        int retries = 0;
+        while (true) {
+            try {
+                return dataSource.getConnection();
+            } catch (final SQLException exception) {
+                retries++;
+                if (retries <= RETRIES_ON_DB_CONNECTION) {
+                    LOGGER.warn("Failed getting a connection from the pool for {}. This was attempt #{}. Retrying...",
+                            operationDescription, retries);
+                    try {
+                        Thread.sleep(750);
+                    } catch (InterruptedException e) {
+                        LOGGER.warn("Got InterruptedException while waiting for a DB Connection for operation {}",
+                                operationDescription, e);
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                else
+                    throw new ContactStorageException(exception);
+            }
         }
     }
 

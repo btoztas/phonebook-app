@@ -91,7 +91,7 @@ public class ContactStorageMysqlContactSearchTest {
     public void testContactStorageSearchThrowContactStorageExceptionInCaseOfExceptionGettingConnection() throws ContactStorageException, SQLException {
         final String token = "search_token";
 
-        expectStorageToGetADbConnectionButThrowException(basicDataSource);
+        expectStorageToGetADbConnectionButThrowException(basicDataSource, 6);
 
         storageMysql.searchByToken(token);
     }
