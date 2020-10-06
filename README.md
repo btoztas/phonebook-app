@@ -23,4 +23,4 @@ There is a `Makefile` present with several handy targets. To start the project y
 
 The Phone Book app will be running on [http://localhost:8080](http://localhost:8080).
 
-`Note:` You will need [Maven](https://maven.apache.org/) and [Docker](https://www.docker.com/).
+`Note:` You will need [npm](https://www.npmjs.com) [Maven](https://maven.apache.org/) and [Docker](https://www.docker.com/).

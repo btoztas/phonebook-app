@@ -17,3 +17,7 @@ start: stop
 
 start-attached: stop
 	docker-compose up
+
+frontend-dev:
+	npm run start --prefix frontend
+
