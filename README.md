@@ -21,4 +21,6 @@ To run the project we use Docker Compose, which contains the following container
 ## Starting the Project
 There is a `Makefile` present with several handy targets. To start the project you should use `make install start`, which will build the project by also running the unit tests and will spin up the containers. Once the project is running, you can also use `make system-tests` to run the System Tests.
 
+The Phone Book app will be running on [http://localhost:8080](http://localhost:8080).
+
 `Note:` You will need [Maven](https://maven.apache.org/) and [Docker](https://www.docker.com/).
