@@ -4,7 +4,7 @@ A simple App to keep track of your Phone Contacts
 ## Project Base Structure
 This Maven project contains three base models that we will enumerate and describe next.
 ### `backend`
-A Jersey Application that will handle the Backend. It will use MySQL as the persistence layer. This backend will be deployed as a Servlet in a Jetty Web Server.
+A Jersey Application that will handle the Backend. It will use MySQL as the persistence layer. This backend will be deployed as a Servlet `.war` in a Jetty Web Server.
 
 ### `frontend`
 A React.js Application that will handle the Frontend. It will be deployed in a NGINX Web Server.
