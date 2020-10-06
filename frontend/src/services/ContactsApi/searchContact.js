@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { searchContactRequest } from "./Http/searchContactRequest";
 
+/**
+ * The Hook responsible to search for a Contacts using the given token via HTTP.
+ */
 export const useContactSearch = (searchToken) => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);

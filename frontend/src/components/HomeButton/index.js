@@ -6,7 +6,7 @@ import { Button, IconButton } from "@material-ui/core";
 export default function HomeButton() {
   const history = useHistory();
 
-  function handleHome(contactId) {
+  function handleHome() {
     history.push(`/`);
   }
 

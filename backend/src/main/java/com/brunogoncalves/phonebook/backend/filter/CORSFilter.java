@@ -6,6 +6,9 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
+/**
+ * CORS Filter.
+ */
 //TODO: I should revisit and understand what is going on here
 @Provider
 public class CORSFilter implements ContainerResponseFilter {

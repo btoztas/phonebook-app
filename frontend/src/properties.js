@@ -1,3 +1,3 @@
 export const properties = {
-  backendUrl: "http://localhost:8080/backend/api",
+  backendUrl: "http://localhost:8090/backend/api",
 };

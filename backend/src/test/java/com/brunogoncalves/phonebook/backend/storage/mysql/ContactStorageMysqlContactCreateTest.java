@@ -7,6 +7,7 @@ import com.brunogoncalves.phonebook.backend.storage.exception.CouldNotInsertCont
 import mockit.Delegate;
 import mockit.Expectations;
 import mockit.Mocked;
+import mockit.Verifications;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,11 +49,11 @@ public class ContactStorageMysqlContactCreateTest {
     @Test
     public void testContactStorageCreateShouldSuccessfullyCreateContact() throws ContactStorageException, SQLException, CouldNotInsertContactException {
         final ContactData contactData = new ContactData("first", "last", "number");
-        final Integer contactId = 1;
+        final int contactId = 1;
         final Contact expectedContact = new Contact(contactId, contactData);
 
         expectStorageToGetADbConnection(basicDataSource, connection);
-        expectStorageToPrepareStatement(connection, INSERT_STATEMENT, preparedStatement);
+        expectStorageToPrepareStatementWithGeneratedKeys(connection, INSERT_STATEMENT, preparedStatement);
         expectStorageToExecuteUpdate(preparedStatement, 1);
         expectStorageToGetGeneratedKeys(preparedStatement, resultSet);
         expectResultSetToReturnContactId(contactId);
@@ -104,11 +105,11 @@ public class ContactStorageMysqlContactCreateTest {
         verifyConnectionIsClosed(connection);
     }
 
-    private void verifySetOfArgumentsOfPreparedStatementForCreate(final ContactData contact) throws SQLException {
-        new Expectations() {{
-            preparedStatement.setString(withEqual(1), withEqual(contact.getPhoneNumber()));
-            preparedStatement.setString(withEqual(2), withEqual(contact.getFirstName()));
-            preparedStatement.setString(withEqual(3), withEqual(contact.getLastName()));
+    private void verifySetOfArgumentsOfPreparedStatementForCreate(final ContactData contactData) throws SQLException {
+        new Verifications() {{
+            preparedStatement.setString(withEqual(1), withEqual(contactData.getPhoneNumber()));
+            preparedStatement.setString(withEqual(2), withEqual(contactData.getFirstName()));
+            preparedStatement.setString(withEqual(3), withEqual(contactData.getLastName()));
         }};
     }
 

@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
- * The model of a contact in the Phone Book.
+ * Holds all the data for a contact.
  */
 public class ContactData {
 

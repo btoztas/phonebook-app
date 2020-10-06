@@ -9,6 +9,10 @@ import {
 } from "@material-ui/core";
 import ConctactListEntry from "../ContactListEntry";
 
+/**
+ * Component responsible to display a List of Contacts passed as argument.
+ * Internally uses the ContactListEntry to display each one of the Contacts.
+ */
 export default function ContactList({ contacts }) {
   if (contacts.length === 0) return <Typography>No Results Found</Typography>;
 

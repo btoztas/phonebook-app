@@ -1,24 +1,12 @@
 import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
-
-import Home from "./views/Home";
-import NewContact from "./views/NewContact";
-import EditContact from "./views/EditContact";
-import PageNotFound from "./views/PageNotFound";
 import TopBar from "./components/TopBar";
+import AppRouter from "./components/AppRouter";
 
 function App() {
   return (
     <>
+      <AppRouter />
       <TopBar />
-      <BrowserRouter>
-        <Switch>
-          <Route path="/" component={Home} exact />
-          <Route path="/new" component={NewContact} exact />
-          <Route path="/edit/:contactId" component={EditContact} exact />
-          <Route component={PageNotFound} />
-        </Switch>
-      </BrowserRouter>
     </>
   );
 }

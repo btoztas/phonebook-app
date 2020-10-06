@@ -1,14 +1,25 @@
 version: '2.3'
 services:
-  jetty:
-    container_name: jetty
+  frontend:
+    container_name: frontend
+    image: nginx:alpine
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./frontend/build:/usr/share/nginx/html
+    networks:
+      - phonebook_network
+
+  backend:
+    container_name: backend
     image: jetty:9.4.31-jre8
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8090:8080"
     volumes:
       - ./backend/target/backend.war:/var/lib/jetty/webapps/backend.war
+      - ./frontend/target/frontend.war:/var/lib/jetty/webapps/frontend.war
     networks:
-      - backend
+      - phonebook_network
     depends_on:
       mysql:
         condition: service_healthy
@@ -17,7 +28,7 @@ services:
     container_name: mysql
     image: mysql:5.7
     networks:
-      - backend
+      - phonebook_network
     ports:
       - "127.0.0.1:3306:3306"
     environment:
@@ -32,4 +43,4 @@ services:
       retries: 10
 
 networks:
-  backend:
+  phonebook_network:

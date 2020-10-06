@@ -4,6 +4,14 @@ import { TextField, Button } from "@material-ui/core";
 
 const PHONE_NUMBER_REGEX = new RegExp("^[+][0-9]+[ ][0-9]+[ ][0-9]{6}$");
 
+/**
+ * Component responsible to handle a contact form. It can be used to handle new
+ * Contacts or to edit existing contacts: to display the current contact data,
+ * the calling component should pass in the current contact data as the first
+ * argument. The second argument is the function that this component should call
+ * to handle the change in input of the form - it will pass to this fuction as
+ * an argument the most updated state of the form everytime the used changes.
+ */
 export default function ContactForm({ defaultContactValue, onFormSubmit }) {
   if (defaultContactValue == null)
     defaultContactValue = {

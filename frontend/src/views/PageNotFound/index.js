@@ -4,6 +4,9 @@ import HomeButton from "../../components/HomeButton/index";
 
 import { Grid, Typography } from "@material-ui/core";
 
+/**
+ * The Page Not Found Page
+ */
 export default function PageNotFound() {
   return (
     <Grid>

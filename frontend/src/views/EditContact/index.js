@@ -4,9 +4,12 @@ import { Grid, Typography } from "@material-ui/core";
 import { useEditContact } from "../../services/ContactsApi/editContact";
 import { useGetContact } from "../../services/ContactsApi/getContact";
 import ContactForm from "../../components/ContactForm";
-import HomeButton from "../../components/HomeButton/index";
-import AddButton from "../../components/AddBurron/index";
+import HomeButton from "../../components/HomeButton";
+import AddButton from "../../components/AddBurron";
 
+/**
+ * The Edit Contact Page
+ */
 export default function EditContact() {
   const { contactId } = useParams();
   const [formInput, setFormInput] = useState(null);

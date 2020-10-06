@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * The model of the Contact Search Request.
+ * The model of the Contact Search Request. It contains a simple token that will be used for the search.
  */
 public class ContactSearchRequest {
 

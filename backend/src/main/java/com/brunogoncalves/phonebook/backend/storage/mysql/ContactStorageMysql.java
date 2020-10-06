@@ -17,6 +17,9 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An implementation of {@link ContactStorage} for MySQL.
+ */
 public class ContactStorageMysql implements ContactStorage {
 
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
@@ -52,19 +55,21 @@ public class ContactStorageMysql implements ContactStorage {
             "SET phone_number = ?, first_name = ?,  last_name = ? " +
             "WHERE id = ?";
 
-    private static final String DELETE_STATEMENT = "" +
-            "DELETE FROM CONTACT " +
-            "WHERE id = ? ";
-
     private static final int TABLE_ALREADY_EXISTS_ERROR_CODE = 1050;
 
     private final BasicDataSource dataSource;
-
 
     public ContactStorageMysql(final String dbUser, final String dbPass, final String jdbcString) throws ContactStorageException {
         this(initializeDataSource(dbUser, dbPass, jdbcString));
     }
 
+    /**
+     * A constructor for this class that allows to pass an instance of {@link BasicDataSource}. This is useful for unit
+     * tests.
+     *
+     * @param dataSource the {@link BasicDataSource} to use.
+     * @throws ContactStorageException in case of issues creating the contacts table.
+     */
     public ContactStorageMysql(final BasicDataSource dataSource) throws ContactStorageException {
         this.dataSource = dataSource;
         ensureContactTableIsCreated();
@@ -142,7 +147,7 @@ public class ContactStorageMysql implements ContactStorage {
     }
 
     private List<Contact> executeSearchAndReturnContacts(PreparedStatement preparedStatement) throws SQLException {
-        try(final ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (final ResultSet resultSet = preparedStatement.executeQuery()) {
             final List<Contact> contacts = new LinkedList<>();
             while (resultSet.next()) {
                 contacts.add(
@@ -187,29 +192,6 @@ public class ContactStorageMysql implements ContactStorage {
             throw new CouldNotUpdateContactException();
     }
 
-    @Override
-    public void delete(final int contactId) throws ContactStorageException, CouldNotDeleteContactException {
-        LOGGER.info("Deleting contact with id {}", contactId);
-        try (final Connection connection = getDbConnection(String.format("delete contact with Id %s", contactId));
-             final PreparedStatement preparedStatement = connection.prepareStatement(DELETE_STATEMENT, Statement.RETURN_GENERATED_KEYS)) {
-            bindPreparedStatementsDelete(preparedStatement, contactId);
-            executeDelete(preparedStatement);
-        } catch (SQLException e) {
-            LOGGER.error("Could not perform delete of contactId {}", contactId, e);
-            throw new ContactStorageException(e);
-        }
-    }
-
-    private void executeDelete(final PreparedStatement preparedStatement) throws SQLException, CouldNotDeleteContactException {
-        final int rowsAffected = preparedStatement.executeUpdate();
-        if (rowsAffected == 0)
-            throw new CouldNotDeleteContactException();
-    }
-
-    private void bindPreparedStatementsDelete(final PreparedStatement preparedStatement, final int contactId) throws SQLException {
-        preparedStatement.setInt(1, contactId);
-    }
-
     private Connection getDbConnection(final String operationDescription) throws ContactStorageException {
         try {
             return dataSource.getConnection();
@@ -220,7 +202,7 @@ public class ContactStorageMysql implements ContactStorage {
     }
 
     private void ensureContactTableIsCreated() throws ContactStorageException {
-        try(final Connection connection = getDbConnection("Contact Table creation")) {
+        try (final Connection connection = getDbConnection("Contact Table creation")) {
             final Statement statement = connection.createStatement();
             statement.execute(CREATE_TABLE_STATEMENT);
             LOGGER.info("Contact table successfully created");

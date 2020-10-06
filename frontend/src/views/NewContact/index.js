@@ -4,6 +4,9 @@ import ContactForm from "../../components/ContactForm";
 import { useNewContact } from "../../services/ContactsApi/newContact";
 import ConctactListEntry from "../../components/ContactListEntry";
 
+import HomeButton from "../../components/HomeButton";
+import AddButton from "../../components/AddBurron";
+
 export default function NewContact() {
   const [formInput, setFormInput] = useState(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -27,6 +30,8 @@ export default function NewContact() {
         <Grid>
           <Typography>New Contact Created!</Typography>
           <ConctactListEntry contactData={data} />
+          <HomeButton />
+          <AddButton />
         </Grid>
       );
     else

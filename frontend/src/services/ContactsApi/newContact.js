@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { newContactRequest } from "./Http/newContactRequest";
 
 //TODO: Error handling on all these requests
+/**
+ * The Hook responsible to create a Contact using the given data via HTTP.
+ */
 export const useNewContact = (contactData) => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);

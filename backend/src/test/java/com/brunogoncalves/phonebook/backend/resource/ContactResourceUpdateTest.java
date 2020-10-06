@@ -23,14 +23,13 @@ public class ContactResourceUpdateTest extends AbstractContactResourceTest {
         final String jsonBody = newContactDataJson("Rick", "Morty", "+39 02 123456");
         final ContactData expectedContact = new ContactData("Rick", "Morty", "+39 02 123456");
 
-        final Response response = target().request(UPDATE_URL_TARGET).put(Entity.json(jsonBody));
+        final Response response = target(UPDATE_URL_TARGET).request().put(Entity.json(jsonBody));
 
         new Verifications() {{
             contactStorage.update(withEqual(expectedContact), withEqual(CONTACT_ID));
             times = 1;
         }};
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-        assertEquals(expectedContact, response.readEntity(ContactData.class));
     }
 
     @Test

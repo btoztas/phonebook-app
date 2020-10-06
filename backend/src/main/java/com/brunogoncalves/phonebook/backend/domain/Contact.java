@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import java.util.Objects;
 
+/**
+ * The domain model for a Contact: it contains an id and {@link ContactData}. The contact data is unwrapped for
+ * the purpose of Serialization and Deserialization.
+ */
 public class Contact {
 
     private int id;

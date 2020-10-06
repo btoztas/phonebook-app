@@ -5,6 +5,9 @@ import ContactSearchInput from "../ContactSearchInput";
 import ContactList from "../ContactList";
 import { useContactSearch } from "../../services/ContactsApi/searchContact";
 
+/**
+ * The Contact Search component is responsible to handle the Contact Search.
+ */
 export default function ContactSearch() {
   const [hasPerformedSearch, setHasPerformedSearch] = useState(false);
   const [searchToken, setSearchToken] = useState(null);
@@ -20,7 +23,7 @@ export default function ContactSearch() {
   };
 
   const searchInputGrid = (
-    <Grid>
+    <Grid container justify="center" xs="12">
       <ContactSearchInput onInputChange={onSearchInput} />
     </Grid>
   );
@@ -28,7 +31,7 @@ export default function ContactSearch() {
   if (!hasPerformedSearch) return <Grid>{searchInputGrid}</Grid>;
   if (isLoading)
     return (
-      <Grid>
+      <Grid container justify="center">
         {searchInputGrid}
         <Grid>
           <Typography>Loading Search...</Typography>

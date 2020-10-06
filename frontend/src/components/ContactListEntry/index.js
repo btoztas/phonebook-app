@@ -10,6 +10,12 @@ import {
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 
+/**
+ * Component responsible to display the contact data passed as argument.
+ * Preferebly it should be used in Table since the wrapper component is a
+ * TableRow. Contains a button that will redirect to the Edit Page of the
+ * given Contact.
+ */
 export default function ConctactListEntry({ contactData }) {
   const history = useHistory();
 

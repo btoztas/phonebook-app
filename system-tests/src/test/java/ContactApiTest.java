@@ -16,7 +16,7 @@ public class ContactApiTest {
 
     @BeforeClass
     public static void setup() {
-        RestAssured.port = 8080;
+        RestAssured.port = 8090;
         RestAssured.baseURI = "http://localhost";
         RestAssured.basePath = "/backend/api/contact";
     }

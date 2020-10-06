@@ -1,10 +1,13 @@
-.PHONY: install start
+.PHONY: install-quick install system-tests stop start start-attached
 
 install-quick:
 	mvn clean install -DskipTests
 
 install:
 	mvn clean install
+
+system-tests:
+	mvn -Psystem-tests -f system-tests/pom.xml test
 
 stop:
 	docker-compose down
@@ -14,7 +17,3 @@ start: stop
 
 start-attached: stop
 	docker-compose up
-
-system-tests:
-	mvn -pl system-tests test
-

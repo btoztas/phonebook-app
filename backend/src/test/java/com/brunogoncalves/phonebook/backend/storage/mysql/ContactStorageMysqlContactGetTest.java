@@ -8,6 +8,7 @@ import com.brunogoncalves.phonebook.backend.storage.exception.CouldNotInsertCont
 import mockit.Delegate;
 import mockit.Expectations;
 import mockit.Mocked;
+import mockit.Verifications;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +49,8 @@ public class ContactStorageMysqlContactGetTest {
     }
 
     @Test
-    public void testContactStorageGetShouldSuccessfullyReturnContact() throws ContactStorageException, SQLException, CouldNotGetContactException {
+    public void testContactStorageGetShouldSuccessfullyReturnContact()
+            throws ContactStorageException, SQLException, CouldNotGetContactException {
         final int contactId = 1;
         final Contact expectedContact = new Contact(contactId, "first", "last", "phone");
 
@@ -67,7 +69,8 @@ public class ContactStorageMysqlContactGetTest {
     }
 
     @Test(expected = ContactStorageException.class)
-    public void testContactStorageCreateThrowContactStorageExceptionInCaseOfExceptionGettingConnection() throws ContactStorageException, SQLException, CouldNotInsertContactException, CouldNotGetContactException {
+    public void testContactStorageCreateThrowContactStorageExceptionInCaseOfExceptionGettingConnection()
+            throws ContactStorageException, SQLException, CouldNotGetContactException {
         expectStorageToGetADbConnectionButThrowException(basicDataSource);
 
         storageMysql.get(1);
@@ -75,7 +78,8 @@ public class ContactStorageMysqlContactGetTest {
 
 
     @Test(expected = ContactStorageException.class)
-    public void testContactStorageCreateThrowContactStorageExceptionInCaseOfExceptionCreatingPreparedStatement() throws ContactStorageException, SQLException, CouldNotInsertContactException, CouldNotGetContactException {
+    public void testContactStorageCreateThrowContactStorageExceptionInCaseOfExceptionCreatingPreparedStatement()
+            throws ContactStorageException, SQLException, CouldNotGetContactException {
         expectStorageToGetADbConnection(basicDataSource, connection);
         expectStorageToPrepareStatementButThrowException(connection, GET_CONTACT_STATEMENT);
 
@@ -85,7 +89,7 @@ public class ContactStorageMysqlContactGetTest {
     }
 
     private void verifySetOfArgumentsOfPreparedStatementForGetById(final int contactId) throws SQLException {
-        new Expectations() {{
+        new Verifications() {{
             preparedStatement.setInt(1, withEqual(contactId));
         }};
     }
@@ -93,25 +97,26 @@ public class ContactStorageMysqlContactGetTest {
     private void expectResultSetToReturnContact(final Contact contact) throws SQLException {
 
         new Expectations() {{
-            resultSet.getInt(1);
+            resultSet.getInt("id");
             result = contact.getId();
             times = 1;
 
-            resultSet.getString(withEqual("firstName"));
+            resultSet.getString("first_name");
             result = contact.getContactData().getFirstName();
             times = 1;
 
-            resultSet.getString(withEqual("lastName"));
+            resultSet.getString("last_name");
             result = contact.getContactData().getLastName();
             times = 1;
 
-            resultSet.getString(withEqual("phoneNumber"));
+            resultSet.getString("phone_number");
             result = contact.getContactData().getPhoneNumber();
             times = 1;
 
             resultSet.next();
             result = new Delegate() {
                 int timesCalled = 0;
+
                 boolean delegate() {
                     timesCalled++;
                     return timesCalled <= 1;

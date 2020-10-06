@@ -13,7 +13,6 @@ import java.util.Properties;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
-//TODO: Somehow this ApplicationPath is not working
 public class PhoneBookApp extends ResourceConfig {
 
     private static final String PROPERTIES_FILE = "config.properties";

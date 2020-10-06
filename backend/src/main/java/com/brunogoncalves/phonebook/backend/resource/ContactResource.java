@@ -36,15 +36,15 @@ public class ContactResource {
 
     @POST
     public Response create(@NotNull @Valid final ContactData contactData) {
-        LOGGER.info("[{}] Create {}", CONTACT_RESOURCE_DESCRIPTION, contactData);
+        LOGGER.info("[{}] Create {}", CONTACT_RESOURCE_DESCRIPTION, contactData.toString());
         Contact contact;
         try {
             contact = contactStorage.create(contactData);
         } catch (ContactStorageException | CouldNotInsertContactException e) {
-            LOGGER.error("[{}] Could not create {}", CONTACT_RESOURCE_DESCRIPTION, contactData, e);
+            LOGGER.error("[{}] Could not create {}", CONTACT_RESOURCE_DESCRIPTION, contactData.toString(), e);
             return Response.serverError().build();
         }
-        LOGGER.debug("[{}] Contact {} was created", CONTACT_RESOURCE_DESCRIPTION, contact);
+        LOGGER.debug("[{}] Contact {} was created", CONTACT_RESOURCE_DESCRIPTION, contact.toString());
         return Response.ok(contact).build();
     }
 
@@ -66,43 +66,30 @@ public class ContactResource {
     @PUT
     @Path("/{contactId}")
     public Response update(@NotNull @Valid final ContactData contactData, @PathParam("contactId") final Integer contactId) {
-        LOGGER.info("[{}] Update {} with contact data {}", CONTACT_RESOURCE_DESCRIPTION, contactId, contactData);
+        LOGGER.info("[{}] Update {} with contact data {}", CONTACT_RESOURCE_DESCRIPTION, contactId, contactData.toString());
         try {
             contactStorage.update(contactData, contactId);
         } catch (ContactStorageException | CouldNotUpdateContactException e) {
-            LOGGER.error("[{}] Could not perform update {}", CONTACT_RESOURCE_DESCRIPTION, contactData, e);
+            LOGGER.error("[{}] Could not perform update {}", CONTACT_RESOURCE_DESCRIPTION, contactData.toString(), e);
             return Response.serverError().build();
         }
-        LOGGER.debug("[{}] Updated {} with {}", CONTACT_RESOURCE_DESCRIPTION, contactId, contactData);
+        LOGGER.debug("[{}] Updated {} with {}", CONTACT_RESOURCE_DESCRIPTION, contactId, contactData.toString());
         return Response.noContent().build();
     }
 
     @POST
     @Path("/search")
     public Response search(@NotNull @Valid final ContactSearchRequest contactSearchRequest) {
-        LOGGER.info("[{}] Search {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest);
+        LOGGER.info("[{}] Search {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest.toString());
         List<Contact> contacts;
         try {
             contacts = contactStorage.searchByToken(contactSearchRequest.getToken());
         } catch (ContactStorageException e) {
-            LOGGER.error("[{}] Could perform search {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest, e);
+            LOGGER.error("[{}] Could perform search {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest.toString(), e);
             return Response.serverError().build();
         }
-        LOGGER.debug("[{}] Search {} returned results: {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest, contacts);
+        LOGGER.debug("[{}] Search {} returned results: {}", CONTACT_RESOURCE_DESCRIPTION, contactSearchRequest.toString(), contacts.toString());
         return Response.ok(contacts).build();
     }
 
-    @DELETE
-    @Path("/{contactId}")
-    public Response delete(@PathParam("contactId") Integer contactId) {
-        LOGGER.info("[{}] Delete Request for {}", CONTACT_RESOURCE_DESCRIPTION, contactId);
-        try {
-            contactStorage.delete(contactId);
-        } catch (ContactStorageException | CouldNotDeleteContactException e) {
-            LOGGER.error("[{}] Could not perform delete request {}", CONTACT_RESOURCE_DESCRIPTION, e);
-            return Response.serverError().build();
-        }
-        LOGGER.debug("[{}] Deleted {}", CONTACT_RESOURCE_DESCRIPTION, contactId);
-        return Response.noContent().build();
-    }
 }
