@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
-import Home from "./views/Home";
-import NewContact from "./views/NewContact";
-import EditContact from "./views/EditContact";
-import PageNotFound from "./views/PageNotFound";
+import Home from "../../views/Home";
+import NewContact from "../../views/NewContact";
+import EditContact from "../../views/EditContact";
+import PageNotFound from "../../views/PageNotFound";
 
 /**
  * The Component where the App Routing Logic lives
