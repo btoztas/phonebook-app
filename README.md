@@ -7,7 +7,7 @@ This Maven project contains three base models that we will enumerate and describ
 A Jersey Application that will handle the Backend. It will use MySQL as the persistence layer. This backend will be deployed as a Servlet in a Jetty Web Server.
 
 ### `frontend`
-A React.js Application that will handle the Frontend. It will use MySQL as the persistence layer. It will be deployed in a NGINX Web Server.
+A React.js Application that will handle the Frontend. It will be deployed in a NGINX Web Server.
 
 ### `system-tests`
 A module containing system level tests whose purpose is to test each one of the other modules end-to-end. For these tests to run, the docker environment must be running. At the moment this module only contains API level tests using RestAssured to the backend API.
