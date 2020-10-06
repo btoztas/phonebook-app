@@ -9,6 +9,9 @@ services:
       - ./frontend/build:/usr/share/nginx/html
     networks:
       - phonebook_network
+    depends_on:
+      backend:
+        condition: service_healthy
 
   backend:
     container_name: backend
@@ -23,6 +26,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    healthcheck:
+      test: "curl -sSf http://localhost:8080/backend > /dev/null"
+      interval: 5s
+      retries: 10
 
   mysql:
     container_name: mysql
